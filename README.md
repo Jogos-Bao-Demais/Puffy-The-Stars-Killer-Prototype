@@ -1,2 +1,2 @@
 # Puffy-The-Stars-Killer-GM
- Game Maker
+Prototipo feito no Game maker
