@@ -7,11 +7,11 @@ function fKillPlayer() {
 
 	direction = point_direction(other.x, other.y, x, y)
 
-	Speed[H] = lengthdir_x(6, direction)
-	Speed[V] = lengthdir_y(4, direction) - 6
+	player_speed[H] = lengthdir_x(6, direction)
+	player_speed[V] = lengthdir_y(4, direction) - 6
 
-	if (sign(Speed[H]) != 0)
-		image_xscale = sign(Speed[H]);
+	if (sign(player_speed[H]) != 0)
+		image_xscale = sign(player_speed[H]);
 
 	life = 0;
 }

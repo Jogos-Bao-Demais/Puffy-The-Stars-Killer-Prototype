@@ -1,31 +1,22 @@
 #region Import
-	
 	GetInput()
-	
 #endregion
 
 #region Macros
+	#macro HORIZONTAL_AXIS 0
+	#macro VERTICAL_AXIS 1
 
-	#macro H 0
-	#macro V 1
+	#macro GRAVITY 0.3
 
-	#macro Horizontal key_right - key_left
-	#macro Gravity 0.3
-
-	#macro SAVEFILE "Save.sav"
-	
+	#macro SAVEFILE "Save.sav"	
 #endregion
 
 #region Enums
-
-	enum TRANS_MODE {
-	
+	enum TRANSITION_MODE {
 		OFF,
 		NEXT,
 		GOTO,
 		RESTART,
 		INTRO,
-
 	};
-	
 #endregion

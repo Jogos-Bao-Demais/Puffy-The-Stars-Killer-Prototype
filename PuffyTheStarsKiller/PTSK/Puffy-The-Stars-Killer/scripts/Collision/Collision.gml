@@ -1,21 +1,21 @@
 function Collision() {
 	// Horizontal Collision
-	if (place_meeting(x + Speed[H], y, oWall)) {	
-		while (!place_meeting(x + sign(Speed[H]), y, oWall)) {		
-			x += sign(Speed[H])			
+	if (place_meeting(x + player_speed[HORIZONTAL_AXIS], y, pCollideable)) {	
+		while (!place_meeting(x + sign(player_speed[HORIZONTAL_AXIS]), y, pCollideable)) {		
+			x += sign(player_speed[HORIZONTAL_AXIS])			
 		}		
-		Speed[H] = 0		
+		player_speed[HORIZONTAL_AXIS] = 0		
 	}	
 	
-	x += Speed[H]
+	x += player_speed[HORIZONTAL_AXIS]
 	
 	// Vertical
-	if (place_meeting(x, y + Speed[V], oWall)) {		
-		while (!place_meeting(x, y + sign(Speed[V]), oWall)) {		
-			y += sign(speed[V])          
+	if (place_meeting(x, y + player_speed[VERTICAL_AXIS], pCollideable)) {		
+		while (!place_meeting(x, y + sign(player_speed[VERTICAL_AXIS]), pCollideable)) {		
+			y += sign(speed[VERTICAL_AXIS])          
 		}
-		Speed[V] = 0  
+		player_speed[VERTICAL_AXIS] = 0  
 	}
 	
-	y += Speed[V]  
+	y += player_speed[VERTICAL_AXIS]  
 }

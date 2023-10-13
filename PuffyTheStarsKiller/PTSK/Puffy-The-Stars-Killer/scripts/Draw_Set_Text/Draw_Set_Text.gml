@@ -10,10 +10,8 @@
 // (Then wodering why their text changes later in development.)
 
 function Draw_Set_Text(colour, font, halign, valign) {
-	
 	draw_set_color(colour);
 	draw_set_font(font);
 	draw_set_halign(halign);
 	draw_set_valign(valign);
-	
 }
