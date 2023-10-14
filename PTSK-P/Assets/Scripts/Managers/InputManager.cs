@@ -15,12 +15,7 @@ public class InputManager : MonoBehaviour
     [SerializeField] private Vector2 _moveDir;
     [SerializeField] private Vector2 _mouseDelta;
 
-    [SerializeField] private bool _playerDash;
-    [SerializeField] private bool _playerSprint;
-    [SerializeField] private bool _leanLeft;
-    [SerializeField] private bool _leanRight;
-    [SerializeField] private bool _crouchKey;
-    [SerializeField] private bool _proneKey;
+    [SerializeField] private bool _dashKey;
 
     [Header("Player Combat")]
     [SerializeField] private bool _shootHold;
@@ -31,8 +26,7 @@ public class InputManager : MonoBehaviour
     public Vector2 MoveDir => _moveDir;
     public Vector2 MouseDelta => _mouseDelta;
 
-    public bool PlayerDash => _playerDash;
-    public bool PlayerSprint => _playerSprint;
+    public bool DashKey => _dashKey;
 
     public bool ShootHold => _shootHold;
     public bool ShootTap => _shootTap;
@@ -78,7 +72,7 @@ public class InputManager : MonoBehaviour
 
         _shootHold = InputActions.Player.ShootHold.ReadValue<float>() > 0f;
 
-        _playerDash = InputActions.Player.Dash.triggered;
+        _dashKey = InputActions.Player.Dash.triggered;
         _shootTap = InputActions.Player.ShootTap.triggered;
         _reloadKey = InputActions.Player.Reload.triggered;
     }

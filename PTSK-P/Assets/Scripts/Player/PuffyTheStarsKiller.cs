@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -7,6 +8,7 @@ using UnityEngine.SceneManagement;
 public partial class PuffyTheStarsKiller : MonoBehaviour, IDamageable
 {
     [Header("References")]
+    [SerializeField] private InputManager _playerInputs;
 
     [Header("Stats")]
     [SerializeField] private float _maxHealth = 1f;
@@ -21,22 +23,17 @@ public partial class PuffyTheStarsKiller : MonoBehaviour, IDamageable
     [Header("Debug")]
     [SerializeField] private bool _shouldDie = false;
 
-    private MainInputActions _inputActions;
     private Rigidbody2D _rigidbody;
 
-    private Vector2 _movementVector = Vector2.zero;
-    private Vector2 _dashDirection = Vector2.zero;
-
     private bool _isDashing;
+    private bool _canMove;
+
     private float _currentHealth;
 
     internal float _lookAngle;
 
     private void Awake()
     {
-        _inputActions =  new MainInputActions();
-        _inputActions.Player.Enable();
-
         _rigidbody = GetComponent<Rigidbody2D>();
     }
 
@@ -50,24 +47,53 @@ public partial class PuffyTheStarsKiller : MonoBehaviour, IDamageable
         if (_currentHealth <= 0f) {
             Die();
         }
-
-        _movementVector = _inputActions.Player.Move.ReadValue<Vector2>();
     }
 
     private void FixedUpdate()
     {
-        Movement();
+        if (_canMove) {
+            Movement();
+        }
+
+        if (_playerInputs.DashKey && !_isDashing) {
+            if (_playerInputs.MoveDir.x != 0 || _playerInputs.MoveDir.y != 0) {
+                Dash();
+            }
+        }
     }
 
     private void Movement()
     {
-        _rigidbody.velocity = _movementVector.x != 0  
-            ? _movementVector.x * _moveSpeed * Time.fixedDeltaTime * Vector2.right + _rigidbody.velocity.y * Vector2.up 
+        _rigidbody.velocity = _playerInputs.MoveDir.x != 0  
+            ? _playerInputs.MoveDir.x * _moveSpeed * Time.fixedDeltaTime * Vector2.right + _rigidbody.velocity.y * Vector2.up 
             : new Vector2(Mathf.Lerp(_rigidbody.velocity.x, 0f, (_friction - 4f) * Time.fixedDeltaTime), _rigidbody.velocity.y);
         
-        _rigidbody.velocity = _movementVector.y != 0  
-            ? _rigidbody.velocity.x * Vector2.right + _movementVector.y * _moveSpeed * Time.fixedDeltaTime * Vector2.up 
+        _rigidbody.velocity = _playerInputs.MoveDir.y != 0  
+            ? _rigidbody.velocity.x * Vector2.right + _playerInputs.MoveDir.y * _moveSpeed * Time.fixedDeltaTime * Vector2.up 
             : new Vector2(_rigidbody.velocity.x, Mathf.Lerp(_rigidbody.velocity.y, 0f, (_friction - 4f) * Time.fixedDeltaTime));
+    }
+
+    private async void Dash()
+    {
+        var dir = new Vector2(_playerInputs.MoveDir.x, _playerInputs.MoveDir.y);
+
+        _rigidbody.velocity = Vector2.zero;
+        _rigidbody.velocity += dir.normalized * _dashSpeed;
+
+        await DashAwait();
+    }
+
+    private async Task DashAwait()
+    {
+        _rigidbody.drag = _dashDrag;
+        _isDashing = true;
+        _canMove = false;
+
+        await Task.Delay((int) (_dashDuration * 1000));
+
+        _canMove = true;
+        _isDashing = false;
+        _rigidbody.drag = 0f;
     }
 
     private void Die()
