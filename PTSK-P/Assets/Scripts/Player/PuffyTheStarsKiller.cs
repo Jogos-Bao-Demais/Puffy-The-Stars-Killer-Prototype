@@ -95,10 +95,10 @@ public partial class PuffyTheStarsKiller : MonoBehaviour, IDamageable, IIntangib
 
         await Task.Delay((int) (_dashDuration * 1000));
 
-        _isIntangible = false;
-        _canMove = true;
-        _isDashing = false;
         _rigidbody.drag = 0f;
+        _isDashing = false;
+        _canMove = true;
+        _isIntangible = false;
     }
 
     private void Die()
