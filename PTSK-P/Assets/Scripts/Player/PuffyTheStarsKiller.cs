@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
-public partial class PuffyTheStarsKiller : MonoBehaviour, IDamageable
+public partial class PuffyTheStarsKiller : MonoBehaviour, IDamageable, IIntangible
 {
     [Header("References")]
     [SerializeField] private InputManager _playerInputs;
@@ -16,21 +16,24 @@ public partial class PuffyTheStarsKiller : MonoBehaviour, IDamageable
     [SerializeField] private float _friction = .2f;
 
     [Header("Dash")]
-    [SerializeField] private float _dashSpeed;
-    [SerializeField] private float _dashDrag;
-    [SerializeField] private float _dashDuration;
+    [SerializeField] private float _dashSpeed = 40f;
+    [SerializeField] private float _dashDrag = .3f;
+    [SerializeField] private float _dashDuration = .1f;
 
     [Header("Debug")]
     [SerializeField] private bool _shouldDie = false;
 
-    private Rigidbody2D _rigidbody;
+    public bool IsIntangible { get => _isIntangible; }
 
-    private bool _isDashing;
-    private bool _canMove;
+    private Rigidbody2D _rigidbody = null;
 
-    private float _currentHealth;
+    private bool _isIntangible = false;
+    private bool _isDashing = false;
+    private bool _canMove = true;
 
-    internal float _lookAngle;
+    private float _currentHealth = 0f;
+
+    internal float _lookAngle = 0f;
 
     private void Awake()
     {
@@ -88,9 +91,11 @@ public partial class PuffyTheStarsKiller : MonoBehaviour, IDamageable
         _rigidbody.drag = _dashDrag;
         _isDashing = true;
         _canMove = false;
+        _isIntangible = true;
 
         await Task.Delay((int) (_dashDuration * 1000));
 
+        _isIntangible = false;
         _canMove = true;
         _isDashing = false;
         _rigidbody.drag = 0f;

@@ -6,3 +6,8 @@ interface IDamageable
 {
     void TakeDemage(float damage);
 }
+
+interface IIntangible
+{
+    public bool IsIntangible { get; }
+}
