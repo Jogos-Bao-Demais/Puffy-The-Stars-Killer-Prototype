@@ -80,6 +80,24 @@ public partial class @MainInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Jump"",
+                    ""type"": ""Button"",
+                    ""id"": ""69847a75-a4fc-42b7-b9b2-1109bc3a0094"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": ""Tap"",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""JumpHold"",
+                    ""type"": ""Button"",
+                    ""id"": ""04889ff7-c4f3-4577-81c1-4ad8f90aab0d"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": ""Hold"",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -192,6 +210,28 @@ public partial class @MainInputActions: IInputActionCollection2, IDisposable
                     ""action"": ""Look"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a85e694a-f73b-4ae9-91e7-ad16d97918e2"",
+                    ""path"": ""<Keyboard>/w"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Jump"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0e4ff9bb-7434-44cc-a2f1-558af4bd5bb9"",
+                    ""path"": ""<Keyboard>/w"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""JumpHold"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -206,6 +246,8 @@ public partial class @MainInputActions: IInputActionCollection2, IDisposable
         m_Player_ShootTap = m_Player.FindAction("ShootTap", throwIfNotFound: true);
         m_Player_ShootHold = m_Player.FindAction("ShootHold", throwIfNotFound: true);
         m_Player_Look = m_Player.FindAction("Look", throwIfNotFound: true);
+        m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
+        m_Player_JumpHold = m_Player.FindAction("JumpHold", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -273,6 +315,8 @@ public partial class @MainInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_ShootTap;
     private readonly InputAction m_Player_ShootHold;
     private readonly InputAction m_Player_Look;
+    private readonly InputAction m_Player_Jump;
+    private readonly InputAction m_Player_JumpHold;
     public struct PlayerActions
     {
         private @MainInputActions m_Wrapper;
@@ -283,6 +327,8 @@ public partial class @MainInputActions: IInputActionCollection2, IDisposable
         public InputAction @ShootTap => m_Wrapper.m_Player_ShootTap;
         public InputAction @ShootHold => m_Wrapper.m_Player_ShootHold;
         public InputAction @Look => m_Wrapper.m_Player_Look;
+        public InputAction @Jump => m_Wrapper.m_Player_Jump;
+        public InputAction @JumpHold => m_Wrapper.m_Player_JumpHold;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -310,6 +356,12 @@ public partial class @MainInputActions: IInputActionCollection2, IDisposable
             @Look.started += instance.OnLook;
             @Look.performed += instance.OnLook;
             @Look.canceled += instance.OnLook;
+            @Jump.started += instance.OnJump;
+            @Jump.performed += instance.OnJump;
+            @Jump.canceled += instance.OnJump;
+            @JumpHold.started += instance.OnJumpHold;
+            @JumpHold.performed += instance.OnJumpHold;
+            @JumpHold.canceled += instance.OnJumpHold;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -332,6 +384,12 @@ public partial class @MainInputActions: IInputActionCollection2, IDisposable
             @Look.started -= instance.OnLook;
             @Look.performed -= instance.OnLook;
             @Look.canceled -= instance.OnLook;
+            @Jump.started -= instance.OnJump;
+            @Jump.performed -= instance.OnJump;
+            @Jump.canceled -= instance.OnJump;
+            @JumpHold.started -= instance.OnJumpHold;
+            @JumpHold.performed -= instance.OnJumpHold;
+            @JumpHold.canceled -= instance.OnJumpHold;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -357,5 +415,7 @@ public partial class @MainInputActions: IInputActionCollection2, IDisposable
         void OnShootTap(InputAction.CallbackContext context);
         void OnShootHold(InputAction.CallbackContext context);
         void OnLook(InputAction.CallbackContext context);
+        void OnJump(InputAction.CallbackContext context);
+        void OnJumpHold(InputAction.CallbackContext context);
     }
 }

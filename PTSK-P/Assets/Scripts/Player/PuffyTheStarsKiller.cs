@@ -10,10 +10,15 @@ public partial class PuffyTheStarsKiller : MonoBehaviour, IDamageable, IIntangib
     [Header("References")]
     [SerializeField] private InputManager _playerInputs;
 
-    [Header("Stats")]
+    [Header("Movement")]
     [SerializeField] private float _maxHealth = 1f;
     [SerializeField] private float _moveSpeed = 10f;
     [SerializeField] private float _friction = .2f;
+
+    [Header("Jump")]
+    [SerializeField] private float _jumpForce = 10f;
+    [SerializeField] private float _fallMultiplier = 2.5f;
+    [SerializeField] private float _lowJumpMultiplier = 2;
 
     [Header("Dash")]
     [SerializeField] private float _dashSpeed = 40f;
@@ -26,18 +31,24 @@ public partial class PuffyTheStarsKiller : MonoBehaviour, IDamageable, IIntangib
     public bool IsIntangible { get => _isIntangible; }
 
     private Rigidbody2D _rigidbody = null;
+    private Collision _col = null;
 
     private bool _isIntangible = false;
     private bool _isDashing = false;
     private bool _canMove = true;
+    private bool _avoidDoubleJump = false;
 
     private float _currentHealth = 0f;
+
+    private int _canJump = 0;
+    private int _lookSide = 0;
 
     internal float _lookAngle = 0f;
 
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody2D>();
+        _col = GetComponent<Collision>();
     }
 
     private void Start()
@@ -52,10 +63,27 @@ public partial class PuffyTheStarsKiller : MonoBehaviour, IDamageable, IIntangib
         }
     }
 
-    private void FixedUpdate()
+    private async void FixedUpdate()
     {
+        _canJump--;
+        
         if (_canMove) {
             Movement();
+        }
+
+        JumpBuffer();
+
+        if (_col.IsGrounded)
+        {
+            _canJump = 8;
+        }
+
+        if (_playerInputs.JumpTap)
+        {
+            if (_canJump > 0)
+            {
+                await Jump();
+            }
         }
 
         if (_playerInputs.DashKey && !_isDashing) {
@@ -69,11 +97,34 @@ public partial class PuffyTheStarsKiller : MonoBehaviour, IDamageable, IIntangib
     {
         _rigidbody.velocity = _playerInputs.MoveDir.x != 0  
             ? _playerInputs.MoveDir.x * _moveSpeed * Time.fixedDeltaTime * Vector2.right + _rigidbody.velocity.y * Vector2.up 
-            : new Vector2(Mathf.Lerp(_rigidbody.velocity.x, 0f, (_friction - 4f) * Time.fixedDeltaTime), _rigidbody.velocity.y);
-        
-        _rigidbody.velocity = _playerInputs.MoveDir.y != 0  
-            ? _rigidbody.velocity.x * Vector2.right + _playerInputs.MoveDir.y * _moveSpeed * Time.fixedDeltaTime * Vector2.up 
-            : new Vector2(_rigidbody.velocity.x, Mathf.Lerp(_rigidbody.velocity.y, 0f, (_friction - 4f) * Time.fixedDeltaTime));
+            : new Vector2(Mathf.Lerp(_rigidbody.velocity.x, 0f, (_friction - 4f) * Time.fixedDeltaTime), _rigidbody.velocity.y);        
+    }
+
+    private async Task Jump()
+    {
+        if (_avoidDoubleJump) return;
+
+        print("jump");
+
+        _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, _jumpForce);
+        _canJump = 0;
+
+        await JumpAwait(.3f);
+    }
+
+    /// <summary>
+    /// if falling, add fallMultiplier
+    /// if jumping and not holding spacebar or walljumping, increase gravity to peform a small jump
+    /// if jumping and holding spacebar, perform a full jump
+    /// </summary>
+    private void JumpBuffer()
+    {
+        if (_rigidbody.velocity.y < 0) {
+            _rigidbody.velocity += (_fallMultiplier - 1) * Physics.gravity.y * Time.deltaTime * Vector2.up;
+        }
+        else if (_rigidbody.velocity.y > 0 && !_playerInputs.JumpHold) {
+            _rigidbody.velocity += (_lowJumpMultiplier - 1) * Physics.gravity.y * Time.deltaTime * Vector2.up;
+        }
     }
 
     private async void Dash()
@@ -85,6 +136,16 @@ public partial class PuffyTheStarsKiller : MonoBehaviour, IDamageable, IIntangib
 
         await DashAwait();
     }
+
+    public async Task JumpAwait(float duration)
+    {
+        _avoidDoubleJump = true;
+
+        await Task.Delay((int) (duration * 1000));
+
+        _avoidDoubleJump = false;
+    }
+
 
     private async Task DashAwait()
     {
